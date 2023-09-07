@@ -6,12 +6,18 @@ export default function Home() {
   const [length, setLength] = useState(8);
   const [spChar, setSpChar] = useState(false);
   const [number, setNumber] = useState(false);
+  const [isCopy, setIsCopy] = useState(false)
 
   const copyRef = useRef(null);
 
   useEffect(() => {
     PasswordGenerator();
   }, [length, number, spChar]);
+
+
+  useEffect(()=>{
+  setIsCopy(false)
+  },[password])
 
   const PasswordGenerator = useCallback(() => {
     let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -26,14 +32,18 @@ export default function Home() {
   }, [length, spChar, number, setpassword]);
 
   const copyHandler = () => {
-    window.navigator.clipboard.writeText(password)
-      .then(() => {
-        copyRef.current.select();
-      })
-      .catch((error) => {
-        console.error('Error copying text to clipboard:', error);
-      });
+    if (copyRef.current) {
+      window.navigator.clipboard.writeText(password)
+        .then(() => {
+
+          setIsCopy(true)
+        })
+        .catch((error) => {
+          console.error('Error copying text to clipboard:', error);
+        });
+    }
   };
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-400 to-indigo-600">
@@ -59,12 +69,13 @@ export default function Home() {
               COPY
             </button>
           </div>
+            {isCopy && <p className='text-green-600 pt-2 ps-2 font-semibold'>Password Copied!</p>}
           <div className="flex flex-wrap space-y-2 mt-4 items-center justify-center gap-4">
             <label className="flex items-center space-x-1">
               <input
                 className="form-range"
                 type="range"
-                onChange={(e) => setLength(e.target.value)}
+                onChange={(e) => setLength(Number(e.target.value))}
               />
               <span className="text-gray-600 text-xs md:text-sm xl:text-base">
                 Length: {length}
